@@ -21,7 +21,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::namespace('Administrator')->group(function () {
 	Route::get('/get_data', 'APIDataController@getAllDatta');
 	Route::post('/sync_data', 'APIDataController@SyncData');
-
+    
 	Route::post('/customer_order', 'APIDataController@customer_order');
 	Route::get('/get_my_order', 'APIDataController@get_my_order');
 	Route::get('/order_details', 'APIDataController@order_details');
@@ -43,8 +43,9 @@ Route::prefix('user')->middleware(['basicAuth'])->group(function () {
     Route::get('/get_data', 'AppUserController@get_All_Datta');
 
     Route::get('/home', 'AppUserController@home');
-
-    Route::post('/customer_order', 'AppUserController@customer_order');
+    Route::middleware('customerActive')->group(function(){
+        Route::post('/customer_order', 'AppUserController@customer_order');
+    });
     Route::get('/get_my_order', 'AppUserController@get_my_order');
 	Route::get('/order_details', 'AppUserController@order_details');
 	Route::get('/customer_order_cancel', 'AppUserController@customer_order_cancel');

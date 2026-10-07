@@ -43,7 +43,6 @@ class AppUserController extends Controller
         $password = $request->input('password');
         $device_token = $request->input('device_token');
         $users = Users::where('user_name', $username)->first();
-       // dd($users);
         if (empty($users)) {
             return response()->json([
                 'status' => 'error',
@@ -164,23 +163,53 @@ class AppUserController extends Controller
         return response()->json($data);
     }
 
-    public function customer_order(request $request)
+    public function customer_order(Request $request)
     {
         $data = json_decode($request->data);
+        // $grand_total = collect($data)->sum('total_amount');
+        // ---------- Validation: every product must be at least 2000 ----------
+        $min_amount = 2000;
         foreach ($data as $value) {
-             $orders = new Orders();
-             $orders->customer_id = $value->customer_id;
-           //  $orders->employee_id = $value->employee_id;
-             $orders->order_date = date('Y-m-d',strtotime($value->order_date));
-             $orders->delivery_date = date('Y-m-d',strtotime($value->delivery_date));
-             $orders->total_amount = $value->total_amount;
-             $orders->status = $value->status;
-             $orders->lat = $value->lat;
-             $orders->lng = $value->lng;
-             $orders->order_status = $value->status;
-             $orders->order_by = $value->order_by;
-             $orders->save();
-             if ($value->status == 'booked') {
+            if ($value->status == 'booked') {
+                foreach ($value->order_details as $order_details) {
+
+                    $product_amount = $order_details->total_amount ?? $order_details->subtotal;
+
+                    if ($product_amount < $min_amount) {
+                        $product = Products::find($order_details->item_id);
+                        if (!$product) {
+                            return response()->json([
+                                'status' => 'error',
+                                'msg' => 'Product not found',
+                            ]);
+                        }
+                        $product_name = $product->product_name ?? ('Item #' . $order_details->item_id);
+
+                        return response()->json([
+                            'status' => 'error',
+                            'msg' => 'The amount limit of product "' . $product_name . '" is below ' . $min_amount . '. Make it at least ' . $min_amount . '.',
+                        ]);
+                    }
+                }
+            }
+        }
+        // ---------------------------------------------------------------------
+
+        foreach ($data as $value) {
+            $orders = new Orders();
+            $orders->customer_id = $value->customer_id;
+            // $orders->employee_id = $value->employee_id;
+            $orders->order_date = date('Y-m-d', strtotime($value->order_date));
+            $orders->delivery_date = date('Y-m-d', strtotime($value->delivery_date));
+            $orders->total_amount = $value->total_amount;
+            $orders->status = $value->status;
+            $orders->lat = $value->lat;
+            $orders->lng = $value->lng;
+            $orders->order_status = $value->status;
+            $orders->order_by = $value->order_by;
+            $orders->save();
+
+            if ($value->status == 'booked') {
                 foreach ($value->order_details as $order_details) {
                     $details = new OrdersDetails();
                     $details->order_id = $orders->id;
@@ -190,9 +219,10 @@ class AppUserController extends Controller
                     $details->subtotal = $order_details->subtotal;
                     $details->save();
                 }
-             }
+            }
         }
-       $datas = array(
+
+        $datas = array(
             'status' => 'success',
             'msg' => 'You have successfully booked the order',
         );
