@@ -28,7 +28,6 @@ class CheckCustomerActive
                 }
             }
         }
-
         $customerIds = array_unique($customerIds);
 
         // 3. Perform batched check if customer_ids exist
@@ -47,6 +46,7 @@ class CheckCustomerActive
                     'status' => 'error',
                     'msg'    => 'Account is deactivated! Please contact Administrator.',
                 ], 403);
+                
             }
         }
 
