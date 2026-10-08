@@ -12,6 +12,9 @@ class Products extends Model
 
     protected $guarded = [];
     protected $table = 'products';
+     protected $casts = [
+        'is_bonus' => 'boolean',
+    ];
 
     public function Companies()
     {

@@ -41,6 +41,7 @@ Route::prefix('user')->middleware(['basicAuth'])->group(function () {
     Route::get('/task_statistics','AppUserController@task_statistics');
     Route::get('/task_details','AppUserController@task_details');
     Route::get('/get_data', 'AppUserController@get_All_Datta');
+    Route::get('/get_policies', 'AppUserController@get_policies');
 
     Route::get('/home', 'AppUserController@home');
     Route::middleware('customerActive')->group(function(){
