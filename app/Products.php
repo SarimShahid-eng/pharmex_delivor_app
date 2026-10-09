@@ -29,4 +29,8 @@ class Products extends Model
     {
         return $this->belongsTo('App\CompanyTask','company_id');
     }
+    public function stocks()
+    {
+        return $this->hasMany('App\Stock','product_id','product_code');
+    }
 }

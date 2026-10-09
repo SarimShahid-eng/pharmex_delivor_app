@@ -16,10 +16,9 @@ class StockController extends Controller
 {
     public function index()
     {
-
         $data = array(
             // 'products'  => Stock::with(['parentProduct'])->groupBy('product_id')->get(),
-            'products'  => Products::get(),
+            'products'  => Products::whereHas('stocks')->get(),
             'title' => 'Stock'
         );
         return view('admin.stock.index')->with($data);
@@ -50,6 +49,15 @@ class StockController extends Controller
                 $catArr = \CommonHelpers::csvToArray($file);
 
                 foreach ($catArr as $key => $y) {
+                    $lineNumber = $key + 2;
+                    // Product::findOrFail()
+                    if (!Products::where('product_code', $y['product_id'])->exists()) {
+                        return response()->json([
+                            'error' => "Product_id '{$y['product_id']}' at line {$lineNumber} does not match any existing product."
+                        ]);
+                    }
+
+
                     if (!empty($y['expiry_date'])) {
                         // Parse 'm-d-Y' or 'm/d/Y' explicitly and reformat to 'Y-m-d'
                         $formattedDate = str_replace('/', '-', $y['expiry_date']);
@@ -102,7 +110,7 @@ class StockController extends Controller
             if (Products::where('product_code', $req->product_id)->exists()) {
                 $data = array(
                     'search'    => TRUE,
-                    'products'  => Products::get(),
+                    'products'  => Products::whereHas('stocks')->get(),
                     'data'  => Stock::with(['parentProduct'])->where('product_id', $req->product_id)->get(),
                     'product_name'   => Products::get()->keyBy('id'),
                     // 'data'  => Stock::with(['parentProduct'])->where('product_id',hashids_decode($req->product_id))->get(),
