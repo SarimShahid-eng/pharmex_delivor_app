@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Administrator;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Stock;
-use App\Products;
-use App\OrderReturnDetails;
-use App\VendorClaimOrderDetails;
-use File;
-// use Illuminate\Support\Facades\Storage;
 use App\BonusPdf;
+use App\Http\Controllers\Controller;
+use App\OrderReturnDetails;
+use App\Products;
+use App\Stock;
+use App\VendorClaimOrderDetails;
+use Carbon\Carbon;
+use File;
+use Illuminate\Http\Request;
 
 class StockController extends Controller
 {
@@ -50,10 +50,10 @@ class StockController extends Controller
                 $catArr = \CommonHelpers::csvToArray($file);
 
                 foreach ($catArr as $key => $y) {
-                    if (strlen($y['product_id']) < 6) {
-                        $catArr[$key]['product_id'] = (strlen($y['product_id']) == 4) ? '00' . $y['product_id'] : '0' . $y['product_id'];
-                        $date = date('d-m-Y', strtotime(str_replace('/', '-', $y['expiry_date'])));
-                        $catArr[$key]['expiry_date'] = date('Y-m-d', strtotime($date));
+                    if (!empty($y['expiry_date'])) {
+                        // Parse 'm-d-Y' or 'm/d/Y' explicitly and reformat to 'Y-m-d'
+                        $formattedDate = str_replace('/', '-', $y['expiry_date']);
+                        $catArr[$key]['expiry_date'] = Carbon::createFromFormat('m-d-Y', $formattedDate)->format('Y-m-d');
                     }
                 }
                 $batchNumbers = array_filter(array_column($catArr, 'batch_no'));
@@ -98,7 +98,6 @@ class StockController extends Controller
 
     public function stockSearch(Request $req)
     {
-
         if (isset($req->product_id)) {
             if (Products::where('product_code', $req->product_id)->exists()) {
                 $data = array(
