@@ -34,8 +34,6 @@ class StockController extends Controller
 
     function import_csv_stock(Request $request)
     {
-
-
         if ($request->hasFile('csv_file')) {
 
             $ext = $request->file('csv_file')->getClientOriginalExtension();

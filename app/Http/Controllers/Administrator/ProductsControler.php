@@ -357,14 +357,99 @@ class ProductsControler extends AdminController
                 $notFoundProductCodes[] = $productCode; // ✅ push missing code
             }
         }
+        if (filled($not_found_product) && $not_found_product > 0) {
+            return response()->json([
+                'error'   => $not_found_product
+                    ? "$not_found_product Products Not Found: " . implode(', ', $notFoundProductCodes)
+                    : null,
+                'not_found_codes' => $notFoundProductCodes,
+            ]);
+        }
 
         return response()->json([
             'success' => "$count_affected_rows Products Price Updated Successfully",
-            'error'   => $not_found_product
-                ? "$not_found_product Products Not Found: " . implode(', ', $notFoundProductCodes)
-                : null,
-            'not_found_codes' => $notFoundProductCodes, // ✅ optional (useful for frontend)
-            // 'redirect' => route('admin.products')
+        ]);
+    }
+    public function import_csv_products_productcode(Request $request)
+    {
+        set_time_limit(0);
+
+        if (!$request->hasFile('csv_file')) {
+            return response()->json(['error' => 'Select CSV File']);
+        }
+
+        $file = $request->file('csv_file');
+        $ext = strtolower($file->getClientOriginalExtension());
+
+        if ($ext !== 'csv') {
+            return response()->json(['error' => 'File type not allowed']);
+        }
+
+        $path = $file->getRealPath();
+        $catArr = \CommonHelpers::csvToArray($path);
+
+        // Collect and trim product names from CSV
+        $csvProductNames = array_filter(array_map(fn($row) => trim($row['product_name'] ?? ''), $catArr));
+
+        if (empty($csvProductNames)) {
+            return response()->json(['error' => 'No product names found in CSV']);
+        }
+
+        // Collect all incoming product codes to check for duplicates
+        $csvProductCodes = array_filter(array_map(fn($row) => trim($row['product_code'] ?? ''), $catArr));
+
+        if (!empty($csvProductCodes)) {
+            $conflictingProducts = Products::whereIn('product_code', $csvProductCodes)
+                ->whereNotIn(\DB::raw('TRIM(product_name)'), $csvProductNames)
+                ->get();
+
+            if ($conflictingProducts->isNotEmpty()) {
+                $conflict = $conflictingProducts->first();
+                return response()->json([
+                    'error' => "Product code '{$conflict->product_code}' cannot be updated because another product ({$conflict->product_name}) already exists with the same code."
+                ]);
+            }
+        }
+
+        // Fetch existing products from DB using TRIM to handle spacing issues
+        $existingProducts = Products::whereIn(\DB::raw('TRIM(product_name)'), $csvProductNames)
+            ->get()
+            ->keyBy(fn($item) => trim($item->product_name));
+
+        $count_affected_rows = 0;
+        $not_found_product = 0;
+        $notFoundProductNames = [];
+
+        foreach ($catArr as $row) {
+            $productName = trim($row['product_name'] ?? '');
+            $productCode = trim($row['product_code'] ?? '');
+
+            if (empty($productName) || empty($productCode)) {
+                continue;
+            }
+
+            if (isset($existingProducts[$productName])) {
+                $existingProducts[$productName]->update([
+                    'product_code' => $productCode,
+                ]);
+
+                $count_affected_rows++;
+            } else {
+                $not_found_product++;
+                $notFoundProductNames[] = $productName;
+            }
+        }
+        if (filled($not_found_product) && $not_found_product > 0) {
+            return response()->json([
+                'error' => $not_found_product
+                    ? "$not_found_product Products Not Found: " . implode(', ', $notFoundProductNames)
+                    : null,
+                'not_found_names' => $notFoundProductNames,
+            ]);
+        }
+
+        return response()->json([
+            'success' => "$count_affected_rows Product Codes Updated Successfully",
         ]);
     }
 

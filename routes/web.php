@@ -70,6 +70,7 @@ Route::prefix('admin')->namespace('Administrator')->middleware('auth')->group(fu
     Route::post('bonus_status', 'ProductsControler@bonus_status')->name('admin.products.bonus_status');
     Route::post('/products/import', 'ProductsControler@import_csv_products')->name('admin.products.import');
     Route::post('/products/import/price', 'ProductsControler@import_csv_products_price')->name('admin.products.price.import');
+    Route::post('/products/import/productcode', 'ProductsControler@import_csv_products_productcode')->name('admin.products.import_productcode');
     Route::post('/get_sub_company', 'ProductsControler@get_sub_company')->name('admin.get_sub_company');
     Route::get('/updating/product_code', 'ProductsControler@updatingCode')->name('admin.updating.code');
     //Employees

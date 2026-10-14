@@ -65,6 +65,26 @@
                             </div>
                        </form>
                     </div>
+                    {{-- <div class="col-md-4">
+                        <form action="{{ route('admin.products.import_productcode') }}" method="post" class="row align-items-end justify-content-center mb-2 ajaxForm" enctype='multipart/form-data'>
+                            @csrf
+                            <div class="col-12">
+                               <div class="row">
+                                  <div class="col-sm-4 text-center offset-sm-3">
+                                      <label for="order_no" class="sr-onlys mr-1">Product Barcode Update CSV</label>
+                                      <input type="file" name="csv_file" accept=".csv,.CSV" id="csv" class="form-control-file" required="">
+                                      <a href="{{ asset('uploads/csvsheet/products_product_code_update.csv') }}" class="d-block mt-3">Product Code Update Format</a>
+                                       <span><b>Note</b>: Use only for update product code which already exists</span>
+       
+                                  </div>
+       
+                                   <div class="col-sm-2 ">
+                                       <button type="submit" class="btn btn-primary waves-effect waves-light" style="margin-top: 24px;">Import</button>
+                                  </div>
+                               </div>
+                            </div>
+                       </form>
+                    </div> --}}
                 </div>
                 
 
