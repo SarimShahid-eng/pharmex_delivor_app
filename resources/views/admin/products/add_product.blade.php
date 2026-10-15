@@ -25,7 +25,7 @@
             </div>
             <div id="filters_div" class="card-body collapse show ">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <form action="{{ route('admin.products.import') }}" method="post" class="row align-items-end justify-content-center mb-2 ajaxForm" enctype='multipart/form-data'>
                             @csrf
                             <div class="col-12">
@@ -45,7 +45,7 @@
                             </div>
                        </form>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <form action="{{ route('admin.products.price.import') }}" method="post" class="row align-items-end justify-content-center mb-2 ajaxForm" enctype='multipart/form-data'>
                             @csrf
                             <div class="col-12">
@@ -65,7 +65,7 @@
                             </div>
                        </form>
                     </div>
-                    {{-- <div class="col-md-4">
+                    <div class="col-md-4">
                         <form action="{{ route('admin.products.import_productcode') }}" method="post" class="row align-items-end justify-content-center mb-2 ajaxForm" enctype='multipart/form-data'>
                             @csrf
                             <div class="col-12">
@@ -84,7 +84,7 @@
                                </div>
                             </div>
                        </form>
-                    </div> --}}
+                    </div>
                 </div>
                 
 
