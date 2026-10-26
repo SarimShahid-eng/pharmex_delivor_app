@@ -171,14 +171,14 @@ class AppUserController extends Controller
         $data = json_decode($request->data);
         // $grand_total = collect($data)->sum('total_amount');
         // ---------- Validation: every product must be at least 2000 ----------
-        $min_amount = 2000;
+        // $min_amount = 2000;
         foreach ($data as $value) {
             if ($value->status == 'booked') {
                 foreach ($value->order_details as $order_details) {
 
-                    $product_amount = $order_details->total_amount ?? $order_details->subtotal;
+                    // $product_amount = $order_details->total_amount ?? $order_details->subtotal;
 
-                    if ($product_amount < $min_amount) {
+                    // if ($product_amount < $min_amount) {
                         $product = Products::find($order_details->item_id);
                         if (!$product) {
                             return response()->json([
@@ -186,13 +186,13 @@ class AppUserController extends Controller
                                 'msg' => 'Product not found',
                             ]);
                         }
-                        $product_name = $product->product_name ?? ('Item #' . $order_details->item_id);
+                        // $product_name = $product->product_name ?? ('Item #' . $order_details->item_id);
 
-                        return response()->json([
-                            'status' => 'error',
-                            'msg' => 'The amount limit of product "' . $product_name . '" is below ' . $min_amount . '. Make it at least ' . $min_amount . '.',
-                        ]);
-                    }
+                        // return response()->json([
+                        //     'status' => 'error',
+                        //     'msg' => 'The amount limit of product "' . $product_name . '" is below ' . $min_amount . '. Make it at least ' . $min_amount . '.',
+                        // ]);
+                    // }
                 }
             }
         }
