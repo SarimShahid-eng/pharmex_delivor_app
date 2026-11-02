@@ -69,7 +69,9 @@ class ProductsControler extends AdminController
         $validator = \Validator::make($request->all(), [
             'unit_price' => ['required', 'numeric'],
             'retail' => ['required', 'numeric'],
+            'max_qty'    => ['nullable', 'numeric', 'min:0'],
         ]);
+  
 
         if ($validator->fails()) {
             return ['errors' => $validator->errors()];
@@ -112,6 +114,7 @@ class ProductsControler extends AdminController
         $product->packing = $request->packing;
         $product->enlist_code = $request->enlist_code;
         $product->unit_price = $request->unit_price;
+        $product->max_qty = $request->max_qty;
         $product->retail_price = $request->retail;
         $product->gst = $request->gst;
         $product->gst_amt = $request->gst_amt;

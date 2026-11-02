@@ -173,6 +173,12 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
+                            <label for="gst_amt">Max qty</label>
+                            <input type="text" id="max_qty" name="max_qty" parsley-trigger="change" placeholder="Enter Max qty user cant bought above" class="form-control" value="{{ @$customer->max_qty ?? '' }}">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
                             <label for="firstname">Image</label>
                             <input type="file" id="firstname" name="img" parsley-trigger="change" placeholder="Enter Unit Price" class="form-control" value="">
                         </div>

@@ -116,6 +116,7 @@
                                 <th>Company <br> Group</th>
                                 <th>Product Code</th>
                                 <th>Product Name</th>
+                                <th>Max qty</th>
                                 <th>Packing</th>
                                 <th>Enlist.Code</th>
                                 <th>Unit Price</th>
@@ -263,6 +264,10 @@
                     {
                         data: 'product_name',
                         name: 'product_name'
+                    },
+                    {
+                        data: 'max_qty',
+                        name: 'max_qty'
                     },
                     {
                         data: 'packing',
