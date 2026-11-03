@@ -18,23 +18,33 @@ class CompaniesController extends AdminController
        // $this->middleware('is_admin');
     }
     
-    public function index()
-    {   
-        if (!CommonHelpers::rights('company_view')) {
-            if (!$this->authorize('create', 'App\Admin')) {
-                abort('403', env('ERROR_403'));
+     public function index()
+        {   
+            if (!CommonHelpers::rights('company_view')) {
+                if (!$this->authorize('create', 'App\Admin')) {
+                    abort('403', env('ERROR_403'));
+                }
             }
-        }
+            $companies = Companies::whereNull('parent_id')
+        ->orderBy('id')
+        ->paginate(16);
+
+        $totals = DB::table('order_details')
+            ->join('products', 'products.id', '=', 'order_details.item_id')
+            ->whereIn('products.company_id', $companies->pluck('id'))
+            ->whereNull('order_details.deleted_at')
+            ->whereNull('products.deleted_at')
+            ->groupBy('products.company_id')
+            ->selectRaw('products.company_id, SUM(order_details.subtotal) as amt')
+            ->pluck('amt', 'company_id');
+
+        $companies->each(function ($c) use ($totals) {
+            $c->amt = $totals[$c->id] ?? 0;
+        });
+
         $data = array(
             'title' => 'All Companies',
-            'company' => Companies::select(DB::raw('companies.*, SUM(order_details.subtotal) as amt'))
-                ->leftJoin('products','companies.id','products.company_id')
-                ->leftJoin('order_details','order_details.item_id','products.id')
-                ->where('order_details.deleted_at',null)
-                ->where('products.deleted_at',null)
-                ->where('companies.parent_id',null)
-                ->groupBy('companies.id')
-                ->paginate(16),
+            'company' => $companies,
         );
       //  dd($data);
         return view('admin.companies.all_companies')->with($data);
