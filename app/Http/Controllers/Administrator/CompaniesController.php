@@ -19,15 +19,15 @@ class CompaniesController extends AdminController
     }
     
      public function index()
-        {   
+    {   
             if (!CommonHelpers::rights('company_view')) {
                 if (!$this->authorize('create', 'App\Admin')) {
                     abort('403', env('ERROR_403'));
                 }
             }
             $companies = Companies::whereNull('parent_id')
-        ->orderBy('id')
-        ->paginate(16);
+            ->orderBy('id')
+            ->paginate(16);
 
         $totals = DB::table('order_details')
             ->join('products', 'products.id', '=', 'order_details.item_id')
